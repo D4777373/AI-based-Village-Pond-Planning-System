@@ -1,0 +1,577 @@
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #172033;
+}
+
+header {
+    background: white;
+    padding: 18px 22px;
+    border-bottom: 1px solid #d8dee6;
+}
+
+header h1 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+}
+
+header p {
+    margin: 0;
+    color: #60708a;
+    font-size: 14px;
+}
+
+main {
+    padding: 16px;
+}
+
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.panel {
+    background: white;
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.panel h2 {
+    margin-top: 0;
+}
+
+.panel p {
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   AUTOMATIC LOCATION ANALYSIS
+   ========================================================= */
+
+.location-search-panel {
+    margin-bottom: 14px;
+}
+
+.location-search-panel h2 {
+    margin-bottom: 6px;
+}
+
+.location-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.location-name-control {
+    flex: 1 1 420px;
+}
+
+.location-name-control input {
+    width: 100%;
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 14px;
+}
+
+.controls h2,
+.controls > p {
+    width: 100%;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.control-item label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.control-item input {
+    min-height: 32px;
+    padding: 5px 7px;
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+}
+
+.file-control {
+    min-width: 215px;
+}
+
+button {
+    min-height: 34px;
+    padding: 7px 13px;
+    border: 1px solid #9ca3af;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #f5f5f5;
+}
+
+button:hover {
+    background: #e9ecef;
+}
+
+#status,
+#locationStatus {
+    width: 100%;
+    margin: 4px 0 0;
+    color: #334155;
+}
+
+
+/* =========================================================
+   OR SEPARATOR
+   ========================================================= */
+
+.analysis-separator {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    color: #667085;
+    font-weight: bold;
+}
+
+.analysis-separator::before,
+.analysis-separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #cdd5df;
+}
+
+.analysis-separator span {
+    padding: 0 14px;
+}
+
+
+/* =========================================================
+   MAP + RESULT LAYOUT
+   ========================================================= */
+
+.layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(320px, 0.95fr);
+
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+
+/*
+   THIS IS THE IMPORTANT RULE.
+
+   Without a height Leaflet cannot display the map.
+*/
+
+#map {
+    width: 100%;
+    height: 520px;
+    min-height: 520px;
+
+    border: 1px solid #d8dee6;
+    border-radius: 8px;
+
+    background: #e8edf2;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   RESULT PANEL
+   ========================================================= */
+
+#results {
+    min-height: 520px;
+    max-height: 520px;
+    overflow-y: auto;
+}
+
+#results h2 {
+    font-size: 21px;
+}
+
+#results h3 {
+    font-size: 16px;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px 16px;
+}
+
+.result-grid > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.result-grid strong {
+    font-size: 12px;
+}
+
+.result-grid span {
+    margin-top: 2px;
+    font-size: 13px;
+}
+
+.result-grid .wide {
+    grid-column: 1 / -1;
+}
+
+#results hr {
+    border: 0;
+    border-top: 1px solid #d6dbe1;
+    margin: 15px 0;
+}
+
+
+/* =========================================================
+   CANDIDATE TABLE
+   ========================================================= */
+
+.candidates-panel {
+    margin-top: 10px;
+}
+
+.section-heading h2 {
+    margin-bottom: 5px;
+}
+
+.section-heading p {
+    margin-top: 0;
+    color: #60708a;
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.candidate-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.candidate-table th,
+.candidate-table td {
+    border-bottom: 1px solid #e0e5eb;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.candidate-table th {
+    background: #f8fafc;
+    font-weight: bold;
+}
+
+.site-button {
+    padding: 5px 10px;
+}
+
+
+/* =========================================================
+   INFORMATION / WARNING
+   ========================================================= */
+
+.notice {
+    background: #f7f9fc;
+    border-left: 4px solid #5b7fa3;
+    padding: 9px 10px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.warning {
+    background: #fff5f5;
+    border-left: 4px solid #d14343;
+    padding: 9px 10px;
+}
+
+
+/* =========================================================
+   AUTOMATIC GENERATED FILES
+   ========================================================= */
+
+#generatedFiles {
+    margin-top: 12px;
+}
+
+.generated-summary {
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #d7dde5;
+    border-radius: 6px;
+    line-height: 1.55;
+}
+
+.generated-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.generated-links a {
+    display: inline-block;
+    padding: 7px 10px;
+    border: 1px solid #0b5ed7;
+    border-radius: 5px;
+    color: #0b5ed7;
+    text-decoration: none;
+}
+
+.generated-links a:hover {
+    background: #eef5ff;
+}
+
+
+/* =========================================================
+   MAP LEGEND
+   ========================================================= */
+
+.map-legend {
+    background: rgba(255, 255, 255, 0.96);
+    padding: 10px 12px;
+
+    border: 1px solid #bfc5cc;
+    border-radius: 6px;
+
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.25);
+
+    max-width: 255px;
+
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    line-height: 1.3;
+
+    color: #1f2933;
+}
+
+.map-legend .legend-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.map-legend .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.map-legend .legend-box {
+    width: 22px;
+    height: 14px;
+
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.map-legend .legend-boundary {
+    background: rgba(11, 94, 215, 0.03);
+    border: 2px dashed #0b5ed7;
+}
+
+.map-legend .legend-catchment {
+    background: rgba(66, 165, 245, 0.35);
+    border: 2px solid #1976d2;
+}
+
+.map-legend .legend-excluded {
+    background: rgba(239, 83, 80, 0.35);
+    border: 2px solid #c62828;
+}
+
+.map-legend .legend-dot {
+    width: 13px;
+    height: 13px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.map-legend .legend-best-site {
+    background: #2e7d32;
+    border: 2px solid #145a32;
+}
+
+.map-legend .legend-other-site {
+    background: #2196f3;
+    border: 2px solid #0d47a1;
+}
+
+.map-legend .legend-divider {
+    border-top: 1px solid #cfd4da;
+    margin: 9px 0;
+}
+
+.map-legend .legend-note {
+    color: #4b5563;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   ORIGINAL CONTOUR OVERLAY
+   ========================================================= */
+
+.map-legend .legend-line {
+    width: 24px;
+    height: 0;
+
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.map-legend .legend-contour {
+    border-top: 3px solid #8b5a2b;
+}
+
+
+/* =========================================================
+   CONTOUR ELEVATION LABELS
+   ========================================================= */
+
+.contour-elevation-label {
+    background: transparent;
+    border: none;
+}
+
+.contour-elevation-label span {
+    display: inline-block;
+
+    padding: 1px 4px;
+
+    background:
+        rgba(255, 255, 255, 0.85);
+
+    border:
+        1px solid rgba(139, 90, 43, 0.7);
+
+    border-radius: 3px;
+
+    color: #6d421f;
+
+    font-size: 10px;
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTOUR TOOLTIP
+   ========================================================= */
+
+.contour-tooltip {
+    background:
+        rgba(255, 255, 255, 0.97);
+
+    border:
+        1px solid #8b5a2b;
+
+    color: #5a371b;
+
+    font-weight: bold;
+    font-size: 12px;
+
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================================
+   POPUP
+   ========================================================= */
+
+.popup-content {
+    min-width: 180px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    #results {
+        max-height: none;
+        min-height: auto;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    main {
+        padding: 8px;
+    }
+
+    #map {
+        height: 420px;
+        min-height: 420px;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-grid .wide {
+        grid-column: auto;
+    }
+
+    .map-legend {
+        max-width: 210px;
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .location-controls,
+    .controls {
+        align-items: stretch;
+    }
+
+    .control-item {
+        width: 100%;
+    }
+}
