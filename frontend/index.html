@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        AI-Based Village Pond Planning System
+    </title>
+
+
+    <!-- ============================================= -->
+    <!-- LEAFLET CSS -->
+    <!-- ============================================= -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <!-- ============================================= -->
+    <!-- OUR CSS -->
+    <!-- ============================================= -->
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+     ===================================================== -->
+
+<header>
+
+    <h1>
+        AI-Based Village Pond Planning System
+    </h1>
+
+    <p>
+        Terrain, Catchment, Rainfall,
+        Free-Land and Pond Suitability Analysis
+    </p>
+
+</header>
+
+
+
+<main>
+
+
+    <!-- =================================================
+         AUTOMATIC LOCATION ANALYSIS
+         ================================================= -->
+
+    <section class="panel location-search-panel">
+
+
+        <h2>
+            Automatic Location Analysis
+        </h2>
+
+
+        <p>
+
+            Enter any real-world location such as
+
+            <strong>
+                IIT Bhilai, Kutelabhata,
+                Chhattisgarh, India
+            </strong>.
+
+            The system will automatically locate the area,
+            download DEM elevation data from OpenTopography,
+            generate contours and perform complete pond
+            suitability analysis.
+
+        </p>
+
+
+
+        <div class="location-controls">
+
+
+            <!-- LOCATION NAME -->
+
+            <div class="control-item location-name-control">
+
+                <label for="locationName">
+
+                    Location Name
+
+                </label>
+
+
+                <input
+                    id="locationName"
+                    type="text"
+                    value="IIT Bhilai, Kutelabhata, Chhattisgarh, India"
+                    placeholder="Village, city, district, state, country"
+                >
+
+            </div>
+
+
+
+            <!-- ANALYSIS RADIUS -->
+
+            <div class="control-item">
+
+                <label for="analysisRadius">
+
+                    Analysis Radius (m)
+
+                </label>
+
+
+                <input
+                    id="analysisRadius"
+                    type="number"
+                    min="500"
+                    max="20000"
+                    step="500"
+                    value="3000"
+                >
+
+            </div>
+
+
+
+            <!-- CONTOUR INTERVAL -->
+
+            <div class="control-item">
+
+                <label for="autoContourInterval">
+
+                    Contour Interval (m)
+
+                </label>
+
+
+                <input
+                    id="autoContourInterval"
+                    type="number"
+                    min="1"
+                    max="50"
+                    step="1"
+                    value="5"
+                >
+
+            </div>
+
+
+
+            <!-- ANALYZE LOCATION BUTTON -->
+
+            <button id="analyzeLocationBtn">
+
+                Find Location & Analyze
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- LOCATION STATUS -->
+
+        <p
+            id="locationStatus"
+            aria-live="polite"
+        ></p>
+
+
+
+        <!-- GENERATED DEM / KML DOWNLOAD LINKS -->
+
+        <div id="generatedFiles"></div>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         SEPARATOR
+         ================================================= -->
+
+    <div class="analysis-separator">
+
+        <span>
+            OR
+        </span>
+
+    </div>
+
+
+
+    <!-- =================================================
+         MANUAL CONTOUR FILE ANALYSIS
+         ================================================= -->
+
+    <section class="panel controls">
+
+
+        <h2>
+            Upload Existing Contour Map
+        </h2>
+
+
+        <p>
+
+            Use this option when you already have a
+            KML/KMZ contour map, such as the contour
+            file provided by the instructor.
+
+        </p>
+
+
+
+        <!-- FILE -->
+
+        <div class="control-item file-control">
+
+            <label for="contourFile">
+
+                Contour Map (.kml / .kmz)
+
+            </label>
+
+
+            <input
+                id="contourFile"
+                type="file"
+                accept=".kml,.kmz"
+            >
+
+        </div>
+
+
+
+        <!-- DEM RESOLUTION -->
+
+        <div class="control-item">
+
+            <label for="resolution">
+
+                DEM Resolution (m)
+
+            </label>
+
+
+            <input
+                id="resolution"
+                type="number"
+                min="2"
+                max="100"
+                step="1"
+                value="10"
+            >
+
+        </div>
+
+
+
+        <!-- MAX CANDIDATES -->
+
+        <div class="control-item">
+
+            <label for="maxCandidates">
+
+                Maximum Candidate Sites
+
+            </label>
+
+
+            <input
+                id="maxCandidates"
+                type="number"
+                min="1"
+                max="50"
+                step="1"
+                value="20"
+            >
+
+        </div>
+
+
+
+        <!-- RAINFALL YEARS -->
+
+        <div class="control-item">
+
+            <label for="rainfallYears">
+
+                Rainfall History (Years)
+
+            </label>
+
+
+            <input
+                id="rainfallYears"
+                type="number"
+                min="1"
+                max="30"
+                step="1"
+                value="5"
+            >
+
+        </div>
+
+
+
+        <!-- RUNOFF COEFFICIENT -->
+
+        <div class="control-item">
+
+            <label for="runoffCoefficient">
+
+                Runoff Coefficient
+
+            </label>
+
+
+            <input
+                id="runoffCoefficient"
+                type="number"
+                min="0"
+                max="1"
+                step="0.05"
+                value="0.30"
+            >
+
+        </div>
+
+
+
+        <!-- POND RADIUS -->
+
+        <div class="control-item">
+
+            <label for="pondRadius">
+
+                Pond Search Radius (m)
+
+            </label>
+
+
+            <input
+                id="pondRadius"
+                type="number"
+                min="10"
+                max="150"
+                step="5"
+                value="40"
+            >
+
+        </div>
+
+
+
+        <!-- MAX DEPTH -->
+
+        <div class="control-item">
+
+            <label for="maxDepth">
+
+                Maximum Pond Depth (m)
+
+            </label>
+
+
+            <input
+                id="maxDepth"
+                type="number"
+                min="1"
+                max="6"
+                step="0.5"
+                value="3"
+            >
+
+        </div>
+
+
+
+        <!-- ANALYZE CONTOUR BUTTON -->
+
+        <button id="analyzeBtn">
+
+            Analyze Contour
+
+        </button>
+
+
+
+        <!-- STATUS -->
+
+        <p
+            id="status"
+            aria-live="polite"
+        ></p>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         MAP + ANALYSIS RESULT
+         ================================================= -->
+
+    <section class="layout">
+
+
+        <!-- MAP -->
+
+        <div id="map"></div>
+
+
+
+        <!-- RESULT PANEL -->
+
+        <aside
+            class="panel"
+            id="results"
+        >
+
+            <h2>
+                Analysis Result
+            </h2>
+
+
+            <p>
+
+                Analyze a location automatically
+                or upload a contour map to begin.
+
+            </p>
+
+
+        </aside>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         CANDIDATE TABLE
+         ================================================= -->
+
+    <section class="panel candidates-panel">
+
+
+        <div class="section-heading">
+
+
+            <div>
+
+                <h2>
+                    Possible Pond Sites
+                </h2>
+
+
+                <p>
+
+                    Candidate locations are generated
+                    from terrain and hydrological analysis.
+
+                    Existing mapped rivers, water bodies,
+                    roads and buildings are excluded
+                    before pond locations are selected.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div id="candidateTableWrap">
+
+            <p>
+
+                Run an analysis to display
+                possible pond locations.
+
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+
+</main>
+
+
+
+<!-- =====================================================
+     LEAFLET JAVASCRIPT
+     ===================================================== -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+
+
+<!-- =====================================================
+     EXISTING MAIN APPLICATION JAVASCRIPT
+     
+     IMPORTANT:
+     app.js MUST load before location.js.
+     
+     location.js uses:
+     
+     map
+     MAP_COLORS
+     originalContourLayer
+     contourLabelLayer
+     showResults()
+     drawAnalysis()
+     renderCandidateTable()
+     
+     which are created inside app.js.
+     ===================================================== -->
+
+<script
+    src="/static/js/app.js"
+></script>
+
+
+
+<!-- =====================================================
+     AUTOMATIC LOCATION ANALYSIS
+     ===================================================== -->
+
+<script
+    src="/static/js/location.js"
+></script>
+
+
+</body>
+
+</html>
