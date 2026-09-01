@@ -1,23 +1,26 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
 
     <title>
         AI-Based Village Pond Planning System
     </title>
 
 
-    <!-- ============================================= -->
-    <!-- LEAFLET CSS -->
-    <!-- ============================================= -->
+    <!-- =================================================
+         LEAFLET CSS
+         ================================================= -->
 
     <link
         rel="stylesheet"
@@ -25,9 +28,19 @@
     >
 
 
-    <!-- ============================================= -->
-    <!-- OUR CSS -->
-    <!-- ============================================= -->
+    <!-- =================================================
+         LEAFLET DRAW CSS
+         ================================================= -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+    >
+
+
+    <!-- =================================================
+         OUR CSS
+         ================================================= -->
 
     <link
         rel="stylesheet"
@@ -50,9 +63,12 @@
         AI-Based Village Pond Planning System
     </h1>
 
+
     <p>
+
         Terrain, Catchment, Rainfall,
         Free-Land and Pond Suitability Analysis
+
     </p>
 
 </header>
@@ -66,7 +82,12 @@
          AUTOMATIC LOCATION ANALYSIS
          ================================================= -->
 
-    <section class="panel location-search-panel">
+    <section
+        class="
+            panel
+            location-search-panel
+        "
+    >
 
 
         <h2>
@@ -79,8 +100,10 @@
             Enter any real-world location such as
 
             <strong>
+
                 IIT Bhilai, Kutelabhata,
                 Chhattisgarh, India
+
             </strong>.
 
             The system will automatically locate the area,
@@ -97,7 +120,12 @@
 
             <!-- LOCATION NAME -->
 
-            <div class="control-item location-name-control">
+            <div
+                class="
+                    control-item
+                    location-name-control
+                "
+            >
 
                 <label for="locationName">
 
@@ -165,7 +193,7 @@
 
 
 
-            <!-- ANALYZE LOCATION BUTTON -->
+            <!-- ANALYZE LOCATION -->
 
             <button id="analyzeLocationBtn">
 
@@ -178,8 +206,6 @@
 
 
 
-        <!-- LOCATION STATUS -->
-
         <p
             id="locationStatus"
             aria-live="polite"
@@ -187,9 +213,253 @@
 
 
 
-        <!-- GENERATED DEM / KML DOWNLOAD LINKS -->
-
         <div id="generatedFiles"></div>
+
+<!-- =================================================
+     SAVE / DISCARD RECTANGLE RESULT
+     ================================================= -->
+
+<div
+    id="areaSavePanel"
+    class="area-save-panel"
+    hidden
+>
+
+    <h3>
+        Keep This Result?
+    </h3>
+
+    <p
+        id="areaSaveMessage"
+    >
+        The analysis result has not been saved.
+    </p>
+
+
+    <div class="area-save-actions">
+
+        <button
+            id="saveAreaResultBtn"
+            type="button"
+        >
+            Save Result as JSON
+        </button>
+
+
+        <button
+            id="discardAreaResultBtn"
+            type="button"
+        >
+            Don't Save
+        </button>
+
+    </div>
+
+</div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         SEPARATOR
+         ================================================= -->
+
+    <div class="analysis-separator">
+
+        <span>
+            OR
+        </span>
+
+    </div>
+
+
+
+    <!-- =================================================
+         DRAW RECTANGLE ANALYSIS
+         ================================================= -->
+
+    <section
+        class="
+            panel
+            area-analysis-panel
+        "
+    >
+
+
+        <h2>
+            Draw an Area on the Map
+        </h2>
+
+
+        <p>
+
+            Use the rectangle tool in the top-left corner
+            of the map to select the exact terrain you want
+            to analyze.
+
+            The system will search for the best pond
+            locations only inside that selected rectangle.
+
+            No place-name geocoding is required for
+            this mode.
+
+        </p>
+<!-- =================================================
+     SEARCH / NAVIGATE MAP
+     ================================================= -->
+
+<div class="map-place-search">
+
+    <label for="mapPlaceSearch">
+
+        Search a Place on the Map
+
+    </label>
+
+
+    <p class="map-place-search-help">
+
+        Start typing a village, town, city,
+        landmark, road or other mapped place.
+
+        Select a suggestion to move the map there,
+        then draw the rectangle around the exact
+        terrain you want to analyze.
+
+    </p>
+
+
+    <div class="map-place-search-input-row">
+
+        <div class="map-place-search-input-wrap">
+
+            <input
+                id="mapPlaceSearch"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Example: Chandigarh, Kutelabhata, IIT Bhilai..."
+                aria-label="Search a place on the map"
+                aria-autocomplete="list"
+                aria-controls="mapPlaceSuggestions"
+            >
+
+
+            <div
+                id="mapPlaceSuggestions"
+                class="map-place-suggestions"
+                role="listbox"
+                hidden
+            ></div>
+
+        </div>
+
+
+        <button
+            id="clearMapPlaceSearchBtn"
+            type="button"
+        >
+            Clear Search
+        </button>
+
+    </div>
+
+
+    <p
+        id="mapPlaceSearchStatus"
+        class="map-place-search-status"
+        aria-live="polite"
+    ></p>
+
+</div>
+
+        <div class="area-controls">
+
+
+            <div class="control-item">
+
+                <label for="areaContourInterval">
+
+                    Contour Interval (m)
+
+                </label>
+
+
+                <input
+                    id="areaContourInterval"
+                    type="number"
+                    min="1"
+                    max="50"
+                    step="1"
+                    value="5"
+                >
+
+            </div>
+
+
+
+            <button
+                id="analyzeAreaBtn"
+                disabled
+            >
+
+                Analyze Selected Area
+
+            </button>
+
+
+
+            <button
+                id="clearAreaBtn"
+                type="button"
+            >
+
+                Clear Selected Area
+
+            </button>
+
+
+        </div>
+
+
+
+        <div
+            id="areaInfo"
+            class="area-info"
+        ></div>
+
+
+
+        <p
+            id="areaStatus"
+            aria-live="polite"
+        ></p>
+
+
+
+        <div
+            id="areaGeneratedFiles"
+        ></div>
+
+
+
+        <p
+            class="
+                notice
+                area-limit-note
+            "
+        >
+
+    You may draw the geographical area you want to analyze.
+
+    Larger selections automatically use a coarser
+    computational grid when necessary.
+
+    DEM and generated contour files are processed
+    temporarily and are not automatically saved.  
+
+        </p>
 
 
     </section>
@@ -224,8 +494,8 @@
 
         <p>
 
-            Use this option when you already have a
-            KML/KMZ contour map, such as the contour
+            Use this option when you already have
+            a KML/KMZ contour map, such as the contour
             file provided by the instructor.
 
         </p>
@@ -234,7 +504,12 @@
 
         <!-- FILE -->
 
-        <div class="control-item file-control">
+        <div
+            class="
+                control-item
+                file-control
+            "
+        >
 
             <label for="contourFile">
 
@@ -432,7 +707,7 @@
 
 
 
-        <!-- RESULT PANEL -->
+        <!-- RESULTS -->
 
         <aside
             class="panel"
@@ -446,8 +721,10 @@
 
             <p>
 
-                Analyze a location automatically
-                or upload a contour map to begin.
+                Search a location,
+                draw an analysis rectangle,
+                or upload a contour map
+                to begin.
 
             </p>
 
@@ -460,16 +737,22 @@
 
 
     <!-- =================================================
-         CANDIDATE TABLE
+         POND CANDIDATE TABLE
          ================================================= -->
 
-    <section class="panel candidates-panel">
+    <section
+        class="
+            panel
+            candidates-panel
+        "
+    >
 
 
         <div class="section-heading">
 
 
             <div>
+
 
                 <h2>
                     Possible Pond Sites
@@ -482,10 +765,11 @@
                     from terrain and hydrological analysis.
 
                     Existing mapped rivers, water bodies,
-                    roads and buildings are excluded
-                    before pond locations are selected.
+                    roads and buildings are excluded before
+                    pond locations are selected.
 
                 </p>
+
 
             </div>
 
@@ -496,12 +780,14 @@
 
         <div id="candidateTableWrap">
 
+
             <p>
 
                 Run an analysis to display
                 possible pond locations.
 
             </p>
+
 
         </div>
 
@@ -525,22 +811,26 @@
 
 
 <!-- =====================================================
-     EXISTING MAIN APPLICATION JAVASCRIPT
-     
-     IMPORTANT:
-     app.js MUST load before location.js.
-     
-     location.js uses:
-     
-     map
-     MAP_COLORS
-     originalContourLayer
-     contourLabelLayer
-     showResults()
-     drawAnalysis()
-     renderCandidateTable()
-     
-     which are created inside app.js.
+     LEAFLET DRAW JAVASCRIPT
+     ===================================================== -->
+
+<script
+    src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"
+></script>
+
+
+
+<!-- =====================================================
+     MAIN APPLICATION JAVASCRIPT
+
+     app.js MUST load first because it creates:
+
+         map
+         layerControl
+         showResults()
+         drawAnalysis()
+         renderCandidateTable()
+         drawGeneratedContours()
      ===================================================== -->
 
 <script
@@ -555,6 +845,16 @@
 
 <script
     src="/static/js/location.js"
+></script>
+
+
+
+<!-- =====================================================
+     DRAWN RECTANGLE ANALYSIS
+     ===================================================== -->
+
+<script
+    src="/static/js/area.js"
 ></script>
 
 
