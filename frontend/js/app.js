@@ -2119,3 +2119,100 @@ document
             }
         }
     );
+    
+// ============================================================
+// START NEW ANALYSIS / RESET APPLICATION
+// ============================================================
+
+function resetApplication() {
+
+    const confirmed = window.confirm(
+        "Start a new analysis?\n\n" +
+        "The current map, pond candidates, catchment results, " +
+        "drawn area and selected files will be cleared."
+    );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // CLEAR MANUAL CONTOUR INPUT
+    // --------------------------------------------------------
+
+    document
+        .querySelectorAll(
+            'input[type="file"]'
+        )
+        .forEach(
+            input => {
+                input.value = "";
+            }
+        );
+
+
+    // --------------------------------------------------------
+    // CLEAR TEMPORARY BROWSER STATE
+    // --------------------------------------------------------
+
+    sessionStorage.removeItem(
+        "pondAnalysisResult"
+    );
+
+    sessionStorage.removeItem(
+        "selectedAnalysisArea"
+    );
+
+    sessionStorage.removeItem(
+        "selectedLocation"
+    );
+
+
+    // --------------------------------------------------------
+    // RELOAD APPLICATION
+    //
+    // This creates a completely fresh Leaflet map and clears:
+    //
+    // - contour layers
+    // - catchment polygon
+    // - pond candidates
+    // - excluded areas
+    // - selected rectangle
+    // - location result
+    // - previous analysis result
+    //
+    // All three analysis modes become available again.
+    // --------------------------------------------------------
+
+    window.location.href =
+        window.location.origin
+        +
+        window.location.pathname;
+}
+
+
+// ============================================================
+// RESET BUTTON EVENT
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const resetButton =
+            document.getElementById(
+                "resetAnalysisBtn"
+            );
+
+
+        if (resetButton) {
+
+            resetButton.addEventListener(
+                "click",
+                resetApplication
+            );
+        }
+    }
+);
