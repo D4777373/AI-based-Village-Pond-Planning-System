@@ -1,6 +1,13 @@
 from __future__ import annotations
 
+from backend.observability import get_tracer
+
+import logging
 import numpy as np
+
+tracer = get_tracer(__name__)
+
+logger = logging.getLogger(__name__)
 
 from rasterio.features import shapes
 
@@ -140,79 +147,111 @@ def analyze_contour_file(
     min_accumulation_percentile: float = 85.0,
 
 ) -> dict:
+    logger.info(
+        "Contour analysis started: file=%s resolution=%.1f m",
+        filename,
+        resolution_m,
+    )
+
 
     # =====================================================
     # STEP 1
     # Parse KML
     # =====================================================
 
-    parsed = parse_contour_file(
-        file_bytes,
-        filename,
-    )
+    with tracer.start_as_current_span("input.kml_parse"):
+        parsed = parse_contour_file(
+            file_bytes,
+            filename,
+        )
 
     # =====================================================
     # STEP 2
     # Contours → DEM
     # =====================================================
 
-    terrain = build_dem(
-        parsed,
-        resolution_m=
-            resolution_m,
-    )
+    with tracer.start_as_current_span("terrain.dem.generate") as span:
+        terrain = build_dem(
+            parsed,
+            resolution_m=
+                resolution_m,
+        )
+
+        span.set_attribute(
+            "terrain.rows",
+            int(terrain.dem.shape[0]),
+        )
+        span.set_attribute(
+            "terrain.cols",
+            int(terrain.dem.shape[1]),
+        )
+        span.set_attribute(
+            "terrain.resolution_m",
+            float(terrain.resolution_m),
+        )
 
     original_dem = terrain.dem
+
+    logger.info(
+        "DEM generated: rows=%d cols=%d resolution=%.1f m",
+        terrain.dem.shape[0],
+        terrain.dem.shape[1],
+        terrain.resolution_m,
+    )
 
     # =====================================================
     # STEP 3
     # Fill artificial DEM sinks
     # =====================================================
 
-    filled_dem = (
-        fill_sinks_priority_flood(
-            original_dem,
-            terrain.valid_mask,
+    with tracer.start_as_current_span("hydrology.priority_flood"):
+        filled_dem = (
+            fill_sinks_priority_flood(
+                original_dem,
+                terrain.valid_mask,
+            )
         )
-    )
 
     # =====================================================
     # STEP 4
     # Calculate slope
     # =====================================================
 
-    slope = (
-        calculate_slope_percent(
-            filled_dem,
-            terrain.valid_mask,
-            terrain.resolution_m,
+    with tracer.start_as_current_span("terrain.slope.calculate"):
+        slope = (
+            calculate_slope_percent(
+                filled_dem,
+                terrain.valid_mask,
+                terrain.resolution_m,
+            )
         )
-    )
 
     # =====================================================
     # STEP 5
     # D8 flow direction
     # =====================================================
 
-    direction = (
-        calculate_flow_direction(
-            filled_dem,
-            terrain.valid_mask,
-            terrain.resolution_m,
+    with tracer.start_as_current_span("hydrology.d8_flow_direction"):
+        direction = (
+            calculate_flow_direction(
+                filled_dem,
+                terrain.valid_mask,
+                terrain.resolution_m,
+            )
         )
-    )
 
     # =====================================================
     # STEP 6
     # Flow accumulation
     # =====================================================
 
-    accumulation = (
-        calculate_flow_accumulation(
-            direction,
-            terrain.valid_mask,
+    with tracer.start_as_current_span("hydrology.flow_accumulation"):
+        accumulation = (
+            calculate_flow_accumulation(
+                direction,
+                terrain.valid_mask,
+            )
         )
-    )
 
     # =====================================================
     # STEP 7
@@ -262,32 +301,43 @@ def analyze_contour_file(
     # Find pond candidates ONLY on feature-clear land
     # =====================================================
 
-    candidate_cells = (
-        find_pond_candidates(
+    with tracer.start_as_current_span("pond.candidate_selection") as span:
+        candidate_cells = (
+            find_pond_candidates(
 
-            filled_dem,
+                filled_dem,
 
-            slope,
+                slope,
 
-            accumulation,
+                accumulation,
 
-            # THIS IS THE IMPORTANT CHANGE
-            land_filter.free_land_mask,
+                # THIS IS THE IMPORTANT CHANGE
+                land_filter.free_land_mask,
 
-            terrain.resolution_m,
+                terrain.resolution_m,
 
-            max_candidates=
-                max_candidates,
+                max_candidates=
+                    max_candidates,
 
-            max_slope_percent=
-                max_candidate_slope_percent,
+                max_slope_percent=
+                    max_candidate_slope_percent,
 
-            min_candidate_spacing_m=
-                min_candidate_spacing_m,
+                min_candidate_spacing_m=
+                    min_candidate_spacing_m,
 
-            min_accumulation_percentile=
-                min_accumulation_percentile,
+                min_accumulation_percentile=
+                    min_accumulation_percentile,
+            )
         )
+
+        span.set_attribute(
+            "pond.candidate_count",
+            len(candidate_cells),
+        )
+
+    logger.info(
+        "Generated %d pond candidates",
+        len(candidate_cells),
     )
 
     if not candidate_cells:
@@ -311,15 +361,26 @@ def analyze_contour_file(
         boundary_wgs84.centroid.y
     )
 
-    rainfall = (
-        get_historical_rainfall(
+    with tracer.start_as_current_span("rainfall.fetch") as span:
+        rainfall = (
+            get_historical_rainfall(
 
-            rain_latitude,
+                rain_latitude,
 
-            rain_longitude,
+                rain_longitude,
 
-            rainfall_years,
+                rainfall_years,
+            )
         )
+
+        span.set_attribute(
+            "rainfall.years",
+            int(rainfall_years),
+        )
+
+    logger.info(
+        "Historical rainfall retrieved for %d years",
+        rainfall_years,
     )
 
     average_rainfall_mm = (

@@ -3,6 +3,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
+from backend.observability import setup_observability
+
 
 from fastapi.responses import (
     FileResponse,
@@ -74,6 +79,8 @@ load_dotenv(
 # FASTAPI APPLICATION
 # =========================================================
 
+setup_observability()
+
 app = FastAPI(
 
     title=(
@@ -89,6 +96,14 @@ app = FastAPI(
 
     version="0.4.0",
 )
+
+
+# =========================================================
+# OPENTELEMETRY INSTRUMENTATION
+# =========================================================
+
+FastAPIInstrumentor.instrument_app(app)
+HTTPXClientInstrumentor().instrument()
 
 
 # =========================================================
